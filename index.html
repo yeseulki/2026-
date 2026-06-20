@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+<title>사회 3단원 · 기말퀴즈</title>
+<style>
+  :root {
+    --bg:#1E2026; --bg2:#2B2F36; --bg3:#252930;
+    --y:#F0B90B; --yd:rgba(240,185,11,0.22); --yb:rgba(240,185,11,0.13);
+    --t1:#EAECEF; --t2:#848E9C;
+    --bd:rgba(234,236,239,0.08); --by:rgba(240,185,11,0.18);
+    --green:#0ECB81; --greenbg:rgba(14,203,129,0.12);
+    --red:#F6465D; --redbg:rgba(246,70,93,0.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    font-family:'Noto Sans KR',sans-serif;
+    background:var(--bg); color:var(--t1);
+    font-size:16px; line-height:1.85;
+    padding:18px 15px 60px;
+    max-width:680px; margin:0 auto;
+  }
+
+  /* 표지 */
+  .cover{
+    background:var(--bg2); border:1px solid var(--by);
+    border-radius:10px; padding:22px 18px 18px;
+    margin-bottom:14px; position:relative; overflow:hidden;
+  }
+  .cover::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--y);}
+  .cv-sub{font-size:12px;color:var(--t2);letter-spacing:.08em;margin-bottom:5px;}
+  .cv-main{font-size:22px;font-weight:700;}
+  .cv-tag{display:inline-block;background:var(--yb);color:var(--y);font-size:12px;font-weight:500;padding:2px 10px;border-radius:20px;border:1px solid var(--by);margin-top:7px;}
+
+  /* 진행도 */
+  .progress-wrap{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;padding:14px 16px;margin-bottom:14px;}
+  .progress-label{display:flex;justify-content:space-between;font-size:13px;color:var(--t2);margin-bottom:8px;}
+  .progress-bar-bg{background:var(--bg3);border-radius:99px;height:8px;overflow:hidden;}
+  .progress-bar{background:var(--y);height:100%;border-radius:99px;transition:width 0.4s ease;width:0%;}
+  .score-display{text-align:center;font-size:13px;color:var(--t2);margin-top:8px;}
+  .score-display span{color:var(--y);font-weight:700;font-size:15px;}
+
+  /* 퀴즈 카드 */
+  .quiz-card{background:var(--bg2);border:1px solid var(--bd);border-radius:10px;margin-bottom:14px;overflow:hidden;}
+  .qh{display:flex;align-items:center;gap:9px;padding:11px 14px;background:var(--bg3);border-bottom:1px solid var(--bd);}
+  .qnum{background:var(--y);color:#1E2026;font-weight:700;font-size:12px;min-width:24px;height:24px;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .qtype{font-size:11px;color:var(--t2);background:var(--bg2);padding:2px 8px;border-radius:20px;border:1px solid var(--bd);margin-left:auto;}
+  .qt{font-size:14.5px;font-weight:700;}
+  .qbody{padding:15px 16px;}
+  .qtext{font-size:15px;line-height:1.9;margin-bottom:12px;}
+  .qbox-inner{background:rgba(240,185,11,0.05);border:1px solid var(--by);border-radius:5px;padding:11px 13px;font-size:14.5px;line-height:1.85;margin-bottom:12px;}
+
+  /* 객관식 */
+  .options{display:flex;flex-direction:column;gap:8px;}
+  .opt-btn{
+    background:var(--bg3);border:1px solid var(--bd);border-radius:8px;
+    padding:10px 14px;font-size:14.5px;color:var(--t1);cursor:pointer;
+    text-align:left;transition:all 0.18s;font-family:'Noto Sans KR',sans-serif;line-height:1.7;
+  }
+  .opt-btn:hover:not(:disabled){border-color:var(--y);background:var(--yb);}
+  .opt-btn.correct{background:var(--greenbg);border-color:var(--green);color:var(--green);}
+  .opt-btn.wrong{background:var(--redbg);border-color:var(--red);color:var(--red);}
+  .opt-btn.reveal{background:var(--greenbg);border-color:var(--green);color:var(--green);}
+  .opt-btn:disabled{cursor:default;}
+
+  /* OX */
+  .ox-wrap{display:flex;gap:12px;}
+  .ox-btn{
+    flex:1;padding:14px;border-radius:8px;font-size:22px;font-weight:700;
+    border:1px solid var(--bd);background:var(--bg3);cursor:pointer;
+    transition:all 0.18s;font-family:'Noto Sans KR',sans-serif;color:var(--t1);
+  }
+  .ox-btn:hover:not(:disabled){border-color:var(--y);background:var(--yb);}
+  .ox-btn.correct{background:var(--greenbg);border-color:var(--green);color:var(--green);}
+  .ox-btn.wrong{background:var(--redbg);border-color:var(--red);color:var(--red);}
+  .ox-btn.reveal{background:var(--greenbg);border-color:var(--green);color:var(--green);}
+  .ox-btn:disabled{cursor:default;}
+
+  /* 단답형 */
+  .short-wrap{display:flex;gap:8px;}
+  .short-input{
+    flex:1;background:var(--bg3);border:1px solid var(--bd);border-radius:8px;
+    padding:10px 14px;font-size:15px;color:var(--t1);font-family:'Noto Sans KR',sans-serif;
+    outline:none;transition:border-color 0.18s;
+  }
+  .short-input:focus{border-color:var(--y);}
+  .short-input.correct{border-color:var(--green);background:var(--greenbg);}
+  .short-input.wrong{border-color:var(--red);background:var(--redbg);}
+  .submit-btn{
+    background:var(--y);color:#1E2026;border:none;border-radius:8px;
+    padding:10px 16px;font-size:14px;font-weight:700;cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;white-space:nowrap;
+  }
+  .submit-btn:disabled{opacity:0.4;cursor:default;}
+
+  /* 해설 */
+  .explanation{
+    display:none;margin-top:12px;
+    background:rgba(240,185,11,0.06);border-left:3px solid var(--y);
+    border-radius:0 6px 6px 0;padding:10px 13px;
+    font-size:14px;line-height:1.8;color:var(--t1);
+  }
+  .explanation.show{display:block;}
+  .exp-label{font-size:12px;color:var(--y);font-weight:700;margin-bottom:4px;}
+
+  /* 다음 버튼 */
+  .next-btn{
+    display:none;width:100%;margin-top:12px;
+    background:var(--y);color:#1E2026;border:none;border-radius:8px;
+    padding:12px;font-size:15px;font-weight:700;cursor:pointer;
+    font-family:'Noto Sans KR',sans-serif;transition:opacity 0.18s;
+  }
+  .next-btn:hover{opacity:0.88;}
+  .next-btn.show{display:block;}
+
+  /* 결과 */
+  .result-screen{
+    display:none;background:var(--bg2);border:1px solid var(--by);
+    border-radius:10px;padding:28px 20px;text-align:center;
+    position:relative;overflow:hidden;
+  }
+  .result-screen::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--y);}
+  .result-screen.show{display:block;}
+  .result-emoji{font-size:48px;margin-bottom:12px;}
+  .result-title{font-size:20px;font-weight:700;margin-bottom:6px;}
+  .result-score{font-size:36px;font-weight:700;color:var(--y);margin-bottom:6px;}
+  .result-sub{font-size:14px;color:var(--t2);margin-bottom:20px;}
+  .result-grade{display:inline-block;background:var(--yb);color:var(--y);border:1px solid var(--by);border-radius:20px;padding:4px 16px;font-size:14px;font-weight:700;margin-bottom:20px;}
+  .review-list{text-align:left;margin-bottom:20px;}
+  .review-title{font-size:13px;color:var(--t2);margin-bottom:10px;font-weight:500;}
+  .review-item{background:var(--bg3);border-radius:8px;padding:10px 13px;font-size:14px;line-height:1.7;margin-bottom:8px;border-left:3px solid var(--red);}
+  .review-item-q{color:var(--t2);font-size:13px;margin-bottom:3px;}
+  .review-item-a{color:var(--green);font-size:13px;}
+  .restart-btn{background:var(--y);color:#1E2026;border:none;border-radius:8px;padding:13px 32px;font-size:15px;font-weight:700;cursor:pointer;font-family:'Noto Sans KR',sans-serif;}
+
+  .shuffle-badge{display:inline-flex;align-items:center;gap:5px;background:var(--yb);color:var(--y);font-size:12px;font-weight:500;padding:2px 10px;border-radius:20px;border:1px solid var(--by);margin-top:7px;margin-left:6px;}
+
+  #quiz-container .quiz-card:last-child{margin-bottom:0;}
+</style>
+</head>
+<body>
+
+<div class="cover">
+  <div class="cv-sub">사회 3단원 · 기말고사 퀴즈</div>
+  <div class="cv-main">경제 생활과 선택</div>
+  <div>
+    <span class="cv-tag">2026 기말고사</span>
+    <span class="shuffle-badge" id="shuffle-badge" style="display:none;">🔀 랜덤 모드</span>
+  </div>
+</div>
+
+<div class="progress-wrap">
+  <div class="progress-label">
+    <span>진행도</span>
+    <span id="prog-text">0 / 20</span>
+  </div>
+  <div class="progress-bar-bg"><div class="progress-bar" id="prog-bar"></div></div>
+  <div class="score-display">현재 점수: <span id="score-now">0</span>점 / <span id="score-total">0</span>점</div>
+</div>
+
+<div id="quiz-container"></div>
+<div class="result-screen" id="result">
+  <div class="result-emoji" id="res-emoji">🎉</div>
+  <div class="result-title" id="res-title"></div>
+  <div class="result-score" id="res-score"></div>
+  <div class="result-sub">총 20문제</div>
+  <div class="result-grade" id="res-grade"></div>
+  <div class="review-list" id="review-list"></div>
+  <button class="restart-btn" onclick="restartQuiz()">🔀 섞어서 다시 풀기</button>
+</div>
+
+<script>
+// ── 문제 데이터 ──────────────────────────────────────────────
+const ALL_QUESTIONS = [
+  {
+    id: 1,
+    title: '경제활동이란?',
+    type: 'mc',
+    question: '경제활동의 정의로 가장 올바른 것은?',
+    options: [
+      { text: '① 사람들이 돈을 벌고 저축하는 모든 활동', correct: false },
+      { text: '② 사람들이 재화와 서비스를 생산하고 분배하며 소비하는 모든 활동', correct: true },
+      { text: '③ 기업이 이윤을 추구하는 활동', correct: false },
+      { text: '④ 정부가 세금을 걷고 사용하는 활동', correct: false },
+    ],
+    explanation: '경제활동은 사람들이 <strong>재화</strong>와 <strong>서비스</strong>를 <strong>생산</strong>하고 <strong>분배</strong>하며 <strong>소비</strong>하는 모든 활동입니다.',
+    answerLabel: '② 사람들이 재화와 서비스를 생산·분배·소비하는 모든 활동',
+  },
+  {
+    id: 2,
+    title: '재화 vs 서비스',
+    type: 'ox',
+    statement: '헤어컷(이발)은 구체적인 형태가 있으므로 재화에 해당한다.',
+    correct: false,
+    explanation: '헤어컷은 구체적인 형태가 없는 <strong>서비스</strong>에 해당합니다. 재화는 구체적인 형태가 있는 물건이고, 서비스는 인간의 가치 있는 행동입니다.',
+    answerLabel: 'X (서비스에 해당)',
+  },
+  {
+    id: 3,
+    title: '분배와 임금',
+    type: 'short',
+    question: '생산에 참여한 사람들에게 그 대가를 나누어 주는 활동을 <strong>분배</strong>라고 한다. 노동의 대가로 받는 분배의 형태는?',
+    answers: ['임금'],
+    explanation: '분배는 생산에 참여한 사람들에게 대가를 나누어 주는 활동으로, 노동의 대가는 <strong>임금</strong>입니다.',
+    answerLabel: '임금',
+  },
+  {
+    id: 4,
+    title: '경제 활동의 주체',
+    type: 'mc',
+    question: '경제 활동의 주체 3가지와 그 역할 연결이 잘못된 것은?',
+    options: [
+      { text: '① 가계 – 주로 소비 활동 담당', correct: false },
+      { text: '② 기업 – 재화나 서비스 생산·공급', correct: false },
+      { text: '③ 정부 – 이윤 극대화를 위해 생산 활동만 담당', correct: true },
+      { text: '④ 정부 – 세금을 바탕으로 공공 서비스 제공', correct: false },
+    ],
+    explanation: '정부는 이윤 극대화가 목적이 아닙니다. 정부는 세금을 바탕으로 사회 간접 자본을 마련하는 <strong>소비 활동</strong>과 공공 서비스를 제공하는 <strong>생산 활동</strong>을 모두 담당합니다.',
+    answerLabel: '③은 오답 – 정부는 소비·생산 활동 모두 담당',
+  },
+  {
+    id: 5,
+    title: '희소성',
+    type: 'ox',
+    statement: '희소성이란 자원의 절대적인 양이 적은 상태를 의미한다.',
+    correct: false,
+    explanation: '희소성은 자원의 절대량이 아니라, <strong>인간의 욕구에 비해</strong> 그것을 충족시켜 줄 수단이 <strong>상대적으로 부족한 상태</strong>입니다.',
+    answerLabel: 'X (상대적으로 부족한 상태)',
+  },
+  {
+    id: 6,
+    title: '기회비용',
+    type: 'mc',
+    context: '민재는 용돈으로 떡볶이, 순대, 김밥 중 하나를 고른다. 세 메뉴의 가격은 동일하다. 만족감 순서는 김밥 > 순대 > 떡볶이이다. 민재는 김밥을 선택했다.',
+    question: '민재의 선택에 따른 기회비용은?',
+    options: [
+      { text: '① 김밥을 먹었을 때의 만족감', correct: false },
+      { text: '② 순대를 먹었을 때의 만족감', correct: true },
+      { text: '③ 떡볶이를 먹었을 때의 만족감', correct: false },
+      { text: '④ 순대와 떡볶이를 먹었을 때의 만족감 합계', correct: false },
+    ],
+    explanation: '기회비용은 선택으로 인해 포기한 여러 대안 중 <strong>가장 가치가 큰 것</strong>입니다. 김밥을 선택했을 때 포기한 것 중 가장 가치 있는 것은 <strong>순대</strong>입니다.',
+    answerLabel: '② 순대를 먹었을 때의 만족감',
+  },
+  {
+    id: 7,
+    title: '합리적 선택',
+    type: 'short',
+    question: '합리적 선택에서, 같은 비용이 든다면 <strong>( )</strong>이 가장 큰 쪽을 선택해야 한다.',
+    answers: ['편익'],
+    explanation: '합리적 선택: 같은 비용이라면 <strong>편익</strong>이 가장 큰 쪽, 같은 편익이라면 <strong>비용</strong>이 가장 작은 쪽을 선택합니다.',
+    answerLabel: '편익',
+  },
+  {
+    id: 8,
+    title: '계획 경제 체제',
+    type: 'mc',
+    question: '계획 경제 체제의 특징으로 옳은 것은?',
+    options: [
+      { text: '① 개인의 자유로운 경제 활동을 최대한 보장한다', correct: false },
+      { text: '② 시장 가격을 통해 경제 문제를 해결한다', correct: false },
+      { text: '③ 국가가 모든 생산 수단을 소유하며 명령·통제한다', correct: true },
+      { text: '④ 빈부격차와 환경오염 문제가 나타난다', correct: false },
+    ],
+    explanation: '<strong>계획 경제 체제</strong>: 국가가 모든 생산 수단을 소유하며 명령·통제로 경제 문제 해결. 장점은 목적 신속 달성, 단점은 근로 의욕 저하·자유로운 경제 활동 제한입니다.',
+    answerLabel: '③ 국가가 모든 생산 수단을 소유하며 명령·통제',
+  },
+  {
+    id: 9,
+    title: '시장 경제 체제 단점',
+    type: 'ox',
+    statement: '시장 경제 체제의 단점으로는 빈부격차와 환경오염 문제가 있다.',
+    correct: true,
+    explanation: '맞습니다. 시장 경제 체제는 장점(활발한 경쟁으로 창의성 발휘)도 있지만, <strong>빈부격차</strong>와 <strong>환경오염</strong> 등의 문제가 발생하는 단점도 있습니다.',
+    answerLabel: 'O',
+  },
+  {
+    id: 10,
+    title: '우리나라 경제 체제',
+    type: 'short',
+    question: '우리나라는 시장 경제 체제와 계획 경제 체제가 혼합된 <strong>( ) 경제 체제</strong>를 채택하고 있다.',
+    answers: ['혼합'],
+    explanation: '우리나라는 <strong>혼합 경제 체제</strong>입니다. 헌법 제119조 ①항은 자유로운 경제 활동을, ②항은 국가의 경제 규제와 조정을 규정합니다.',
+    answerLabel: '혼합',
+  },
+  {
+    id: 11,
+    title: '기업의 역할',
+    type: 'mc',
+    question: '기업의 역할로 옳지 않은 것은?',
+    options: [
+      { text: '① 사람들에게 필요한 재화와 서비스 생산·공급', correct: false },
+      { text: '② 노동자 고용으로 일자리 제공', correct: false },
+      { text: '③ 세금을 걷어 사회 간접 자본 마련', correct: true },
+      { text: '④ 국가에 세금 납부로 재정 기여', correct: false },
+    ],
+    explanation: '세금을 걷어 사회 간접 자본을 마련하는 것은 <strong>정부</strong>의 역할입니다. 기업은 세금을 <strong>납부</strong>하는 주체입니다.',
+    answerLabel: '③은 정부의 역할',
+  },
+  {
+    id: 12,
+    title: '기업가 정신',
+    type: 'short',
+    question: '실패의 위험을 무릅쓰고 끊임없는 혁신을 통해 새로운 수익을 창출하고, 경쟁력을 확보해 나가려는 기업가의 도전 정신과 의지를 무엇이라 하는가?',
+    answers: ['기업가 정신', '기업가정신'],
+    explanation: '<strong>기업가 정신</strong>: 실패의 위험을 무릅쓰고 끊임없는 혁신으로 새로운 수익을 창출하고 경쟁력을 확보해 나가려는 기업가의 도전 정신과 의지입니다.',
+    answerLabel: '기업가 정신',
+  },
+  {
+    id: 13,
+    title: '기업의 사회적 책임',
+    type: 'ox',
+    statement: '기업이 사회적 책임을 져야 하는 이유는 기업이 경제 사회의 구성원이기 때문이다.',
+    correct: true,
+    explanation: '맞습니다. 기업은 <strong>경제 사회의 구성원</strong>이기 때문에 이윤 추구뿐만 아니라 사회적 책임도 져야 합니다.',
+    answerLabel: 'O',
+  },
+  {
+    id: 14,
+    title: '일생 동안의 경제생활',
+    type: 'mc',
+    question: '생애 주기별 경제생활에 대한 설명으로 옳은 것은?',
+    options: [
+      { text: '① 청년기에는 소득이 가장 높다', correct: false },
+      { text: '② 노년기에는 소득과 소비가 모두 없어진다', correct: false },
+      { text: '③ 중·장년기는 소득이 가장 높은 시기이다', correct: true },
+      { text: '④ 유소년기에는 스스로 소득을 벌어 소비한다', correct: false },
+    ],
+    explanation: '유소년기(부모 소득 의존), 청년기(소득·소비 모두 적음), <strong>중·장년기(소득 가장 높음)</strong>, 노년기(소득은 줄지만 소비는 지속).',
+    answerLabel: '③ 중·장년기는 소득이 가장 높은 시기',
+  },
+  {
+    id: 15,
+    title: '자산 관리의 필요성',
+    type: 'ox',
+    statement: '소득을 얻을 수 있는 기간은 평생이지만, 소비를 하는 기간은 한정적이기 때문에 자산 관리가 필요하다.',
+    correct: false,
+    explanation: '반대입니다! 소득을 얻을 수 있는 기간이 <strong>한정적·제한적</strong>이고, 소비를 하는 기간은 <strong>평생</strong>이기 때문에 소득이 많을 때 자산 관리가 필요합니다.',
+    answerLabel: 'X (소득 기간이 한정, 소비는 평생)',
+  },
+  {
+    id: 16,
+    title: '자산의 종류',
+    type: 'mc',
+    question: '다음 중 수익성과 위험성이 모두 높은 자산은?',
+    options: [
+      { text: '① 예금', correct: false },
+      { text: '② 적금', correct: false },
+      { text: '③ 주식', correct: true },
+      { text: '④ 보험', correct: false },
+    ],
+    explanation: '<strong>주식</strong>은 수익성 높음, 위험성 높음이 특징입니다. 예금·적금은 수익성·위험성 모두 낮고 유동성이 높습니다.',
+    answerLabel: '③ 주식',
+  },
+  {
+    id: 17,
+    title: '자산 관리 고려 요소',
+    type: 'short',
+    question: '자산 관리 시 종합적으로 고려해야 하는 3가지를 모두 쓰시오. (예: A, B, C)',
+    answers: ['수익성', '위험성', '유동성'],
+    multiKeyword: true,
+    explanation: '자산 관리 시 고려 요소 3가지: <strong>① 수익성 ② 위험성(안정성) ③ 유동성</strong>',
+    answerLabel: '수익성, 위험성(안정성), 유동성',
+  },
+  {
+    id: 18,
+    title: '유동성',
+    type: 'short',
+    question: '자산을 손쉽게 현금화할 수 있는 정도를 무엇이라 하는가?',
+    answers: ['유동성'],
+    explanation: '<strong>유동성</strong>: 자산을 손쉽게 현금화할 수 있는 정도. 예금은 유동성이 높고, 채권은 유동성이 낮습니다.',
+    answerLabel: '유동성',
+  },
+  {
+    id: 19,
+    title: '노후 대비 자산',
+    type: 'mc',
+    question: '청년기 또는 중·장년기에 소득의 일부를 저축하여 노후에 일정 금액을 받는 금융 상품은?',
+    options: [
+      { text: '① 펀드', correct: false },
+      { text: '② 보험', correct: false },
+      { text: '③ 채권', correct: false },
+      { text: '④ 연금', correct: true },
+    ],
+    explanation: '<strong>연금</strong>은 청년기 또는 중·장년기에 소득의 일부를 저축하여 노후에 일정 금액을 받는 상품입니다.',
+    answerLabel: '④ 연금',
+  },
+  {
+    id: 20,
+    title: '신용의 의미',
+    type: 'mc',
+    question: '신용에 대한 설명으로 가장 옳은 것은?',
+    options: [
+      { text: '① 현재 보유한 재산의 총 가치', correct: false },
+      { text: '② 미래에 돈을 갚을 것을 약속하고 현재 상품이나 돈을 빌려 쓸 수 있는 능력', correct: true },
+      { text: '③ 금융 기관에 저축한 총 금액', correct: false },
+      { text: '④ 기업이 발행하는 차용 증서', correct: false },
+    ],
+    explanation: '<strong>신용</strong>: 미래에 돈을 갚을 것을 약속하고 현재 상품이나 돈을 빌려 쓸 수 있는 능력. ④는 채권에 대한 설명입니다.',
+    answerLabel: '② 미래에 돈을 갚을 것을 약속하고 현재 상품/돈을 빌려 쓸 수 있는 능력',
+  },
+];
+
+// ── 상태 변수 ────────────────────────────────────────────────
+let queue = [];       // 현재 출제 순서 (셔플된 배열)
+let currentIdx = 0;   // 현재 문제 인덱스
+let score = 0;
+let answered = 0;
+let wrongList = [];
+let isFirstRound = true;
+
+// ── 유틸 ─────────────────────────────────────────────────────
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function typeLabel(type) {
+  return { mc: '객관식', ox: 'O / X', short: '단답형' }[type] || '';
+}
+
+// ── 렌더링 ───────────────────────────────────────────────────
+function renderQuestion(q, displayNum) {
+  const card = document.createElement('div');
+  card.className = 'quiz-card';
+  card.id = 'qcard-' + q.id;
+
+  let bodyHTML = '';
+
+  // 본문
+  if (q.type === 'mc') {
+    const ctx = q.context ? `<div class="qbox-inner">${q.context}</div>` : '';
+    const opts = q.options.map((o, i) =>
+      `<button class="opt-btn" data-qid="${q.id}" data-correct="${o.correct}" onclick="handleMC(this)">${o.text}</button>`
+    ).join('');
+    bodyHTML = `
+      <div class="qtext">${q.question}</div>
+      ${ctx}
+      <div class="options">${opts}</div>`;
+  } else if (q.type === 'ox') {
+    bodyHTML = `
+      <div class="qtext">다음 설명이 맞으면 O, 틀리면 X를 선택하세요.</div>
+      <div class="qbox-inner">${q.statement}</div>
+      <div class="ox-wrap">
+        <button class="ox-btn" data-qid="${q.id}" data-val="true" onclick="handleOX(this)">O</button>
+        <button class="ox-btn" data-qid="${q.id}" data-val="false" onclick="handleOX(this)">X</button>
+      </div>`;
+  } else if (q.type === 'short') {
+    bodyHTML = `
+      <div class="qtext">${q.question}</div>
+      <div class="short-wrap">
+        <input class="short-input" id="inp-${q.id}" type="text" placeholder="답을 입력하세요"
+          onkeydown="if(event.key==='Enter') handleShort(${q.id})">
+        <button class="submit-btn" id="sub-${q.id}" onclick="handleShort(${q.id})">확인</button>
+      </div>`;
+  }
+
+  card.innerHTML = `
+    <div class="qh">
+      <div class="qnum">${displayNum}</div>
+      <div class="qt">${q.title}</div>
+      <div class="qtype">${typeLabel(q.type)}</div>
+    </div>
+    <div class="qbody">
+      ${bodyHTML}
+      <div class="explanation" id="exp-${q.id}">
+        <div class="exp-label">💡 해설</div>
+        ${q.explanation}
+      </div>
+      <button class="next-btn" id="next-${q.id}" onclick="goNext()">
+        ${currentIdx + 1 >= queue.length ? '결과 보기 🎯' : '다음 문제 →'}
+      </button>
+    </div>`;
+
+  return card;
+}
+
+function showCurrentQuestion() {
+  const container = document.getElementById('quiz-container');
+  container.innerHTML = '';
+  if (currentIdx >= queue.length) { showResult(); return; }
+
+  const q = queue[currentIdx];
+  const card = renderQuestion(q, currentIdx + 1);
+  container.appendChild(card);
+
+  // 다음 버튼 텍스트 업데이트
+  const nextBtn = document.getElementById('next-' + q.id);
+  if (nextBtn) {
+    nextBtn.textContent = currentIdx + 1 >= queue.length ? '결과 보기 🎯' : '다음 문제 →';
+  }
+}
+
+// ── 정답 처리 ─────────────────────────────────────────────────
+function afterAnswer(qid, isCorrect) {
+  answered++;
+  if (isCorrect) score++;
+  else {
+    const q = queue.find(x => x.id === qid);
+    wrongList.push({ title: q.title, answerLabel: q.answerLabel });
+  }
+  document.getElementById('exp-' + qid).classList.add('show');
+  const nb = document.getElementById('next-' + qid);
+  nb.classList.add('show');
+  updateProgress();
+}
+
+function handleMC(btn) {
+  const qid = parseInt(btn.dataset.qid);
+  const isCorrect = btn.dataset.correct === 'true';
+  const card = document.getElementById('qcard-' + qid);
+  card.querySelectorAll('.opt-btn').forEach(b => {
+    b.disabled = true;
+    if (b.dataset.correct === 'true') b.classList.add('reveal');
+  });
+  btn.classList.remove('reveal');
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  afterAnswer(qid, isCorrect);
+}
+
+function handleOX(btn) {
+  const qid = parseInt(btn.dataset.qid);
+  const q = queue.find(x => x.id === qid);
+  const selected = btn.dataset.val === 'true';
+  const isCorrect = selected === q.correct;
+  const card = document.getElementById('qcard-' + qid);
+  card.querySelectorAll('.ox-btn').forEach(b => {
+    b.disabled = true;
+    if ((b.dataset.val === 'true') === q.correct) b.classList.add('reveal');
+  });
+  btn.classList.remove('reveal');
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  afterAnswer(qid, isCorrect);
+}
+
+function handleShort(qid) {
+  const q = queue.find(x => x.id === qid);
+  const inp = document.getElementById('inp-' + qid);
+  const sub = document.getElementById('sub-' + qid);
+  const val = inp.value.trim();
+  if (!val) return;
+  inp.disabled = true;
+  sub.disabled = true;
+
+  let isCorrect;
+  if (q.multiKeyword) {
+    isCorrect = q.answers.every(kw => val.includes(kw));
+  } else {
+    isCorrect = q.answers.some(a => val === a || val.includes(a) || a.includes(val));
+  }
+  inp.classList.add(isCorrect ? 'correct' : 'wrong');
+  afterAnswer(qid, isCorrect);
+}
+
+function goNext() {
+  currentIdx++;
+  if (currentIdx >= queue.length) { showResult(); return; }
+  showCurrentQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── 진행도 ────────────────────────────────────────────────────
+function updateProgress() {
+  const pct = (answered / queue.length) * 100;
+  document.getElementById('prog-bar').style.width = pct + '%';
+  document.getElementById('prog-text').textContent = answered + ' / ' + queue.length;
+  document.getElementById('score-now').textContent = score;
+  document.getElementById('score-total').textContent = answered;
+}
+
+// ── 결과 ─────────────────────────────────────────────────────
+function showResult() {
+  document.getElementById('quiz-container').innerHTML = '';
+  const res = document.getElementById('result');
+  res.classList.add('show');
+
+  const pct = Math.round((score / queue.length) * 100);
+  document.getElementById('res-score').textContent = score + ' / ' + queue.length;
+
+  let emoji, title, grade;
+  if (pct >= 95) { emoji='🏆'; title='완벽해! 기말고사 준비 완료!'; grade='S등급 · 만점 수준'; }
+  else if (pct >= 80) { emoji='🎉'; title='잘했어! 조금만 더!'; grade='A등급 · 우수'; }
+  else if (pct >= 65) { emoji='💪'; title='절반 이상! 틀린 것만 복습하자'; grade='B등급 · 보통'; }
+  else if (pct >= 50) { emoji='📚'; title='좀 더 공부가 필요해'; grade='C등급 · 부족'; }
+  else { emoji='😤'; title='정리본 다시 보고 재도전!'; grade='D등급 · 재학습 필요'; }
+
+  document.getElementById('res-emoji').textContent = emoji;
+  document.getElementById('res-title').textContent = title;
+  document.getElementById('res-grade').textContent = grade;
+
+  const reviewEl = document.getElementById('review-list');
+  if (wrongList.length === 0) {
+    reviewEl.innerHTML = '<div style="text-align:center;color:var(--green);font-size:15px;padding:12px 0;">🎯 모두 정답! 오답 없음</div>';
+  } else {
+    let html = `<div class="review-title">❌ 틀린 문제 (${wrongList.length}개) — 다시 확인하세요</div>`;
+    wrongList.forEach(w => {
+      html += `<div class="review-item">
+        <div class="review-item-q">Q. ${w.title}</div>
+        <div class="review-item-a">✅ 정답: ${w.answerLabel}</div>
+      </div>`;
+    });
+    reviewEl.innerHTML = html;
+  }
+
+  res.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── 재시작 ────────────────────────────────────────────────────
+function restartQuiz() {
+  score = 0; answered = 0; wrongList = []; currentIdx = 0;
+  isFirstRound = false;
+
+  queue = shuffle(ALL_QUESTIONS);
+
+  document.getElementById('result').classList.remove('show');
+  document.getElementById('shuffle-badge').style.display = 'inline-flex';
+  updateProgress();
+  showCurrentQuestion();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ── 초기 실행 ─────────────────────────────────────────────────
+queue = [...ALL_QUESTIONS]; // 첫 번째 실행: 순서대로
+updateProgress();
+showCurrentQuestion();
+</script>
+</body>
+</html>
